@@ -1,0 +1,13 @@
+<!-- views/inventory/classification.ejs -->
+<main class="main-content">
+  <!-- Content Heading -->
+  <% if (title) { %>
+    <h1 class="classification-header"><%= title %></h1>
+  <% } %>
+  
+  <!-- Message Block -->
+  <%# messages() %>
+  
+  <!-- Inventory Display -->
+  <%- grid %>
+</main>
