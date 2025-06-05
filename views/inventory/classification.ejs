@@ -1,13 +1,20 @@
 <!-- views/inventory/classification.ejs -->
-<main class="main-content">
-  <!-- Content Heading -->
-  <% if (title) { %>
-    <h1 class="classification-header"><%= title %></h1>
-  <% } %>
-  
-  <!-- Message Block -->
-  <%# messages() %>
-  
-  <!-- Inventory Display -->
-  <%- grid %>
-</main>
+
+<!-- Content Heading Section -->
+<!-- This section displays the main heading for the classification page -->
+<!-- It uses the title passed from the controller and ensures SEO best practices -->
+<% if (title) { %>
+  <h1 class="classification-header"><%= title %></h1>
+<% } else { %>
+  <% res.redirect('/') %>
+<% } %>
+
+<!-- Message Block Section -->
+<!-- This section will display any system messages or errors when implemented -->
+<!-- Currently commented out until message functionality is added -->
+<%# messages() %>
+
+<!-- Inventory Display Section -->
+<!-- This section displays the vehicle grid built by the utility function -->
+<!-- The unescaped output allows the HTML grid to render properly -->
+<%- grid %>
