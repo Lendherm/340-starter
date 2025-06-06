@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('../partials/head') %>
+<body>
+  <div class="container">
+   
+
+    <main class="main-content">
+      <section class="error-section">
+        <h1><%= title %></h1>
+        <div class="error-content">
+          <div class="error-message">
+            <p><%= message %></p>
+            <img src="/images/vehicles/mechanic.jpg" alt="Broken down car" class="error-image">
+            <p class="error-humor">Looks like this vehicle needs some repairs! Our team is on it.</p>
+            
+            <% if (title === '404') { %>
+              <p class="error-suggestion">The page you're looking for might have been towed away.</p>
+            <% } else { %>
+              <p class="error-suggestion">Something went wrong under the hood. Try again later!</p>
+            <% } %>
+          </div>
+          
+          <div class="error-actions">
+            <a href="/" class="cta-button">Back to Home</a>
+            <a href="/inventory" class="secondary-button">Browse Vehicles</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    
+  </div>
+
+  <script>
+    // Mobile menu functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+      const nav = document.querySelector('nav');
+      
+      if (mobileMenuBtn) {
+        mobileMenuBtn.addEventListener('click', function() {
+          nav.classList.toggle('show');
+        });
+      }
+    });
+  </script>
+</body>
+</html>

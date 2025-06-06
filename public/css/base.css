@@ -330,35 +330,82 @@ footer {
   margin: 30px auto;
 }
 
-/* Classification Page Header */
-.classification-header {
+/* Error Page Styles */
+.error-section {
   text-align: center;
-  margin-bottom: 30px;
-  padding-bottom: 20px;
-  border-bottom: 2px solid var(--secondary-color);
+  padding: 2rem;
 }
 
-.classification-header h1 {
-  color: var(--primary-color);
-  font-size: 2.2rem;
-  margin-bottom: 10px;
+.error-content {
+  max-width: 800px;
+  margin: 0 auto;
+  background-color: #f8f9fa;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-/* Classification View */
-.classification-header {
-  text-align: center;
-  color: var(--primary-color);
-  margin-bottom: 30px;
-  padding-bottom: 15px;
-  border-bottom: 2px solid var(--secondary-color);
-  font-size: 2.2rem;
+.error-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+  margin: 1rem 0;
+  border: 1px solid #ddd;
 }
 
-/* Responsive adjustments */
-@media (max-width: 767px) {
-  .classification-header {
-    font-size: 1.8rem;
-    margin-bottom: 20px;
+.error-humor {
+  font-style: italic;
+  color: #666;
+  margin: 1rem 0;
+  font-size: 1.1rem;
+}
+
+.error-suggestion {
+  color: #444;
+  margin-bottom: 1.5rem;
+}
+
+.error-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.cta-button, .secondary-button {
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.cta-button {
+  background-color: #1a3e72;
+  color: white;
+}
+
+.secondary-button {
+  background-color: #6c757d;
+  color: white;
+}
+
+.cta-button:hover {
+  background-color: #0d2a5c;
+}
+
+.secondary-button:hover {
+  background-color: #5a6268;
+}
+
+@media (max-width: 600px) {
+  .error-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .error-humor, .error-suggestion {
+    font-size: 1rem;
   }
 }
 

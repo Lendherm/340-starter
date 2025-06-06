@@ -4,7 +4,7 @@ const Util = {};
 /* ************************
  * Constructs the nav HTML unordered list
  ************************** */
-Util.getNav = async function (req, res, next) {
+Util.getNav = async function () {
   try {
     const data = await invModel.getClassifications();
     let list = "<ul class='nav-list'>";
@@ -72,6 +72,45 @@ Util.buildClassificationGrid = async function(data) {
   }
   
   return grid;
+};
+
+/* ****************************************
+ * Middleware For Handling Errors
+ * Wrap other function in this for 
+ * General Error Handling
+ **************************************** */
+Util.handleErrors = fn => (req, res, next) => {
+  return Promise.resolve(fn(req, res, next)).catch(next);
+};
+
+/* ****************************************
+ * Build inventory item details view HTML
+ * **************************************** */
+Util.buildInventoryItemDetail = async function(vehicle) {
+  try {
+    let detailHTML = `
+      <div class="vehicle-detail">
+        <div class="detail-image">
+          <img src="${vehicle.inv_image}" 
+               alt="Image of ${vehicle.inv_make} ${vehicle.inv_model}" 
+               class="detail-img">
+        </div>
+        <div class="detail-info">
+          <h2>${vehicle.inv_year} ${vehicle.inv_make} ${vehicle.inv_model}</h2>
+          <div class="price">$${new Intl.NumberFormat('en-US').format(vehicle.inv_price)}</div>
+          <div class="specs">
+            <p><strong>Mileage:</strong> ${vehicle.inv_miles.toLocaleString()} miles</p>
+            <p><strong>Color:</strong> ${vehicle.inv_color}</p>
+          </div>
+          <div class="description">${vehicle.inv_description}</div>
+        </div>
+      </div>
+    `;
+    return detailHTML;
+  } catch (error) {
+    console.error("Error building inventory detail:", error);
+    return "<p>Sorry, we couldn't load the vehicle details at this time.</p>";
+  }
 };
 
 module.exports = Util;
