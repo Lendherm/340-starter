@@ -9,12 +9,35 @@
 const express = require("express");
 const expressLayouts = require("express-ejs-layouts");
 const env = require("dotenv").config();
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
 const app = express();
 const static = require("./routes/static");
 const baseController = require("./controllers/baseController");
 const inventoryRoute = require("./routes/inventoryRoute");
 const utilities = require("./utilities/");
 const path = require("path");
+
+/* ***********************
+ * Security Middleware
+ *************************/
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+        "script-src": ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+        "style-src": ["'self'", "'unsafe-inline'"],
+        "img-src": ["'self'", "data:"]
+      }
+    }
+  })
+);
+
+app.use(rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100 // limit each IP to 100 requests per windowMs
+}));
 
 /* ***********************
  * View Engine and Templates
@@ -31,20 +54,20 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(static);
 
+// Add year to all views
+app.use((req, res, next) => {
+  res.locals.year = new Date().getFullYear();
+  next();
+});
+
 /* ***********************
  * Routes
  *************************/
-// Home route
 app.get("/", utilities.handleErrors(baseController.buildHome));
-
-// Inventory routes
-app.use("/inv", inventoryRoute);
-
-// Account routes (to be implemented later)
-// app.use("/account", require("./routes/accountRoute"));
+app.use("/inv", utilities.handleErrors(inventoryRoute));
 
 /* ***********************
- * 404 Route - must be last route before error handler
+ * 404 Route
  *************************/
 app.use(async (req, res, next) => {
   next({status: 404, message: "Sorry, we appear to have lost that page."});
@@ -52,7 +75,6 @@ app.use(async (req, res, next) => {
 
 /* ***********************
  * Express Error Handler
- * Place after all other middleware
  *************************/
 app.use(async (err, req, res, next) => {
   let nav;
@@ -60,42 +82,33 @@ app.use(async (err, req, res, next) => {
     nav = await utilities.getNav();
   } catch (error) {
     console.error("Error getting navigation:", error);
-    nav = await utilities.getNav(); // Fallback to basic nav
+    nav = '<ul class="nav-list"><li><a href="/">Home</a></li></ul>';
   }
   
-  console.error(`Error at: "${req.originalUrl}": ${err.message}`);
+  console.error(`Error ${err.status || 500} at ${req.method} ${req.originalUrl}`);
+  console.error('Error details:', err);
   
-  let message;
-  if (err.status === 404) {
-    message = err.message;
-  } else {
-    message = "Oh no! There was a crash. Maybe try a different route?";
-    // In development, you might want to see the actual error
-    if (process.env.NODE_ENV === "development") {
-      message = err.message;
-    }
-  }
+  const isDev = process.env.NODE_ENV === 'development';
+  const message = err.status === 404 ? err.message : 
+    isDev ? err.message : "Oh no! There was a crash. Maybe try a different route?";
 
   res.status(err.status || 500).render("errors/error", {
-    title: err.status || "Server Error",
+    title: `${err.status || 500} Error`,
     message,
     nav,
     errors: null,
-    layout: "./layouts/layout"
+    layout: "./layouts/layout",
+    stack: isDev ? err.stack : null
   });
 });
 
 /* ***********************
- * Local Server Information
- * Values from .env (environment) file
+ * Server Configuration
  *************************/
 const port = process.env.PORT || 5500;
 const host = process.env.HOST || "localhost";
 
-/* ***********************
- * Log statement to confirm server operation
- *************************/
 app.listen(port, () => {
-  console.log(`app listening on ${host}:${port}`);
-  console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
+  console.log(`Server running on ${host}:${port}`);
+  console.log(`Mode: ${process.env.NODE_ENV || "development"}`);
 });

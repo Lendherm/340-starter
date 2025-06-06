@@ -1,5 +1,10 @@
-<% const d = new Date()
-let year = d.getFullYear() %>
 <footer>
-  <p class="copyright">&copy; <%= year %>, CSE 340 App</p>
+  <div class="footer-content">
+    <p class="copyright">&copy; <%= year %>, CSE 340 App</p>
+    <% if (process.env.NODE_ENV === 'development') { %>
+      <div class="dev-tools">
+        <a href="/inv/trigger-error" class="error-link">Test Error Handling</a>
+      </div>
+    <% } %>
+  </div>
 </footer>

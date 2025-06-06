@@ -1,46 +1,40 @@
 const invModel = require("../models/inventory-model");
 const Util = {};
 
-/* ************************
- * Constructs the nav HTML unordered list
- ************************** */
 Util.getNav = async function () {
   try {
     const data = await invModel.getClassifications();
-    let list = "<ul class='nav-list'>";
+    let list = '<ul class="nav-list">';
     list += '<li><a href="/" title="Home page">Home</a></li>';
     
     data.rows.forEach((row) => {
-      list += "<li>";
-      list +=
-        '<a href="/inv/type/' +
-        row.classification_id +
-        '" title="See our inventory of ' +
-        row.classification_name +
-        ' vehicles">' +
-        row.classification_name +
-        "</a>";
-      list += "</li>";
+      list += `<li>
+        <a href="/inv/type/${row.classification_id}" 
+           title="Browse ${row.classification_name} vehicles">
+          ${row.classification_name}
+        </a>
+      </li>`;
     });
     
     list += "</ul>";
     return list;
   } catch (error) {
     console.error("getNav error:", error);
-    return "<ul class='nav-list'><li><a href='/'>Home</a></li></ul>";
+    return '<ul class="nav-list"><li><a href="/">Home</a></li></ul>';
   }
 };
 
-/* **************************************
- * Build the classification view HTML
- * ************************************ */
 Util.buildClassificationGrid = async function(data) {
-  let grid = "";
-  
-  if (data && data.length > 0) {
-    grid = '<div class="classification-view">';
-    grid += '<h1 class="classification-title">' + data[0].classification_name + ' Vehicles</h1>';
-    grid += '<div class="vehicle-grid">';
+  try {
+    if (!data || data.length === 0) {
+      return '<div class="no-vehicles"><p>No vehicles found in this classification</p></div>';
+    }
+    
+    let grid = `
+      <div class="classification-view">
+        <h1 class="classification-title">${data[0].classification_name} Vehicles</h1>
+        <div class="vehicle-grid">
+    `;
     
     data.forEach(vehicle => {
       grid += `
@@ -48,69 +42,84 @@ Util.buildClassificationGrid = async function(data) {
           <a href="/inv/detail/${vehicle.inv_id}" 
              title="View ${vehicle.inv_make} ${vehicle.inv_model} details">
             <img src="${vehicle.inv_thumbnail}" 
-                 alt="Image of ${vehicle.inv_make} ${vehicle.inv_model}" 
+                 alt="${vehicle.inv_make} ${vehicle.inv_model}" 
                  class="vehicle-thumbnail">
-          </a>
-          <div class="vehicle-details">
-            <h2 class="vehicle-title">
-              <a href="/inv/detail/${vehicle.inv_id}" 
-                 title="View ${vehicle.inv_make} ${vehicle.inv_model} details">
-                ${vehicle.inv_make} ${vehicle.inv_model}
-              </a>
-            </h2>
-            <div class="vehicle-price">
-              $${new Intl.NumberFormat('en-US').format(vehicle.inv_price)}
+            <div class="vehicle-details">
+              <h2>${vehicle.inv_make} ${vehicle.inv_model}</h2>
+              <div class="vehicle-price">
+                $${new Intl.NumberFormat('en-US').format(vehicle.inv_price)}
+              </div>
             </div>
-          </div>
+          </a>
         </div>
       `;
     });
     
     grid += '</div></div>';
-  } else {
-    grid = '<div class="no-vehicles"><p>Sorry, no matching vehicles could be found.</p></div>';
+    return grid;
+  } catch (error) {
+    console.error("Error building classification grid:", error);
+    return '<div class="error-message"><p>Error loading vehicle data</p></div>';
   }
-  
-  return grid;
 };
 
-/* ****************************************
- * Middleware For Handling Errors
- * Wrap other function in this for 
- * General Error Handling
- **************************************** */
-Util.handleErrors = fn => (req, res, next) => {
-  return Promise.resolve(fn(req, res, next)).catch(next);
-};
-
-/* ****************************************
- * Build inventory item details view HTML
- * **************************************** */
 Util.buildInventoryItemDetail = async function(vehicle) {
   try {
-    let detailHTML = `
-      <div class="vehicle-detail">
-        <div class="detail-image">
+    if (!vehicle) {
+      return '<div class="error-message"><p>Vehicle details not available</p></div>';
+    }
+    
+    return `
+      <div class="vehicle-detail-container">
+        <div class="vehicle-gallery">
           <img src="${vehicle.inv_image}" 
-               alt="Image of ${vehicle.inv_make} ${vehicle.inv_model}" 
-               class="detail-img">
-        </div>
-        <div class="detail-info">
-          <h2>${vehicle.inv_year} ${vehicle.inv_make} ${vehicle.inv_model}</h2>
-          <div class="price">$${new Intl.NumberFormat('en-US').format(vehicle.inv_price)}</div>
-          <div class="specs">
-            <p><strong>Mileage:</strong> ${vehicle.inv_miles.toLocaleString()} miles</p>
-            <p><strong>Color:</strong> ${vehicle.inv_color}</p>
+               alt="${vehicle.inv_year} ${vehicle.inv_make} ${vehicle.inv_model}"
+               class="main-image">
+          <div class="inspection-banner">
+            <span>✓ Certified Pre-Owned</span>
           </div>
-          <div class="description">${vehicle.inv_description}</div>
+        </div>
+        
+        <div class="vehicle-specs">
+          <h1>${vehicle.inv_year} ${vehicle.inv_make} ${vehicle.inv_model}</h1>
+          
+          <div class="price-section">
+            <span class="price">$${new Intl.NumberFormat('en-US').format(vehicle.inv_price)}</span>
+            <span class="price-note">No-Haggle Price</span>
+          </div>
+          
+          <div class="specs-grid">
+            <div class="spec-item">
+              <span class="spec-label">Mileage:</span>
+              <span class="spec-value">${vehicle.inv_miles.toLocaleString()} miles</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label">Color:</span>
+              <span class="spec-value">${vehicle.inv_color}</span>
+            </div>
+            <!-- Add more specs as needed -->
+          </div>
+          
+          <div class="vehicle-description">
+            <h3>Description</h3>
+            <p>${vehicle.inv_description}</p>
+          </div>
+          
+          <div class="action-buttons">
+            <button class="btn-primary">Contact Us</button>
+            <button class="btn-secondary">Schedule Test Drive</button>
+          </div>
         </div>
       </div>
     `;
-    return detailHTML;
   } catch (error) {
     console.error("Error building inventory detail:", error);
-    return "<p>Sorry, we couldn't load the vehicle details at this time.</p>";
+    return '<div class="error-message"><p>Error loading vehicle details</p></div>';
   }
+};
+
+Util.handleErrors = fn => (req, res, next) => {
+  return Promise.resolve(fn(req, res, next)).catch(next);
 };
 
 module.exports = Util;

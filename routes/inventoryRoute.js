@@ -1,9 +1,10 @@
-// routes/inventoryRoute.js
 const express = require("express");
 const router = express.Router();
 const invController = require("../controllers/invController");
 
-// Route to build inventory by classification view
-router.get("/type/:classificationId", invController.buildByClassificationId);
+// Inventory routes
+router.get("/type/:classificationId(\\d+)", invController.buildByClassificationId);
+router.get("/detail/:inv_id(\\d+)", invController.buildByInventoryId);
+router.get("/trigger-error", invController.triggerError);
 
 module.exports = router;
