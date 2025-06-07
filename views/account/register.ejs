@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('../partials/head') %>
+<body>
+  <div class="container">
+   
+
+    <main class="main-content">
+      <section class="registration-section">
+        <h1>Register</h1>
+        
+        <% if (messages && messages.notice) { %>
+          <div class="flash-message notice">
+            <%= messages.notice %>
+          </div>
+        <% } %>
+
+        <form action="/account/register" method="post" class="registration-form">
+          <div class="form-group">
+            <label for="account_firstname">First Name</label>
+            <input type="text" id="account_firstname" name="account_firstname" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="account_lastname">Last Name</label>
+            <input type="text" id="account_lastname" name="account_lastname" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="account_email">Email Address</label>
+            <input type="email" id="account_email" name="account_email" required>
+          </div>
+          
+          <div class="form-group password-group">
+            <label for="account_password">Password</label>
+            <input type="password" id="account_password" name="account_password" required
+                   pattern="^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{12,}$"
+                   title="Must be at least 12 characters with 1 uppercase, 1 number, and 1 special character">
+            <button type="button" class="toggle-password" aria-label="Show password">👁️</button>
+            <div class="password-requirements">
+              <p>Password must:</p>
+              <ul>
+                <li>Be at least 12 characters</li>
+                <li>Contain at least 1 uppercase letter</li>
+                <li>Contain at least 1 number</li>
+                <li>Contain at least 1 special character</li>
+              </ul>
+            </div>
+          </div>
+          
+          <button type="submit" class="btn-primary">Register</button>
+        </form>
+        
+        <div class="registration-links">
+          <a href="/account/login">Already have an account? Login</a>
+        </div>
+      </section>
+    </main>
+
+   
+  </div>
+
+  <script>
+    // Password toggle functionality
+    document.querySelector('.toggle-password').addEventListener('click', function() {
+      const passwordInput = document.getElementById('account_password');
+      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordInput.setAttribute('type', type);
+      this.textContent = type === 'password' ? '👁️' : '🔒';
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('../partials/head') %>
+<body>
+  <div class="container">
+   
+
+    <main class="main-content">
+      <section class="login-section">
+        <h1>Login</h1>
+        
+        <% if (messages.success) { %>
+          <div class="alert alert-success">
+            <%= messages.success %>
+          </div>
+        <% } %>
+        
+        <% if (messages.error) { %>
+          <div class="alert alert-error">
+            <%= messages.error %>
+          </div>
+        <% } %>
+
+        <form action="/account/login" method="post" class="login-form">
+          <div class="form-group">
+            <label for="account_email">Email Address</label>
+            <input type="email" id="account_email" name="account_email" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="account_password">Password</label>
+            <input type="password" id="account_password" name="account_password" required>
+          </div>
+          
+          <button type="submit" class="btn-primary">Login</button>
+        </form>
+        
+        <div class="login-links">
+          <a href="/account/register">Need to register?</a>
+        </div>
+      </section>
+    </main>
+
+    
+  </div>
+</body>
+</html>

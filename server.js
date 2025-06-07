@@ -11,28 +11,27 @@ const expressLayouts = require("express-ejs-layouts");
 const env = require("dotenv").config();
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
-const app = express();
-const static = require("./routes/static");
-const baseController = require("./controllers/baseController");
-const inventoryRoute = require("./routes/inventoryRoute");
-const utilities = require("./utilities/");
+const session = require("express-session");
+const pool = require('./database/');
 const path = require("path");
+const bodyParser = require("body-parser");
+const flash = require("connect-flash");
+
+const app = express();
 
 /* ***********************
  * Security Middleware
  *************************/
-app.use(
-  helmet({
-    contentSecurityPolicy: {
-      directives: {
-        ...helmet.contentSecurityPolicy.getDefaultDirectives(),
-        "script-src": ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
-        "style-src": ["'self'", "'unsafe-inline'"],
-        "img-src": ["'self'", "data:"]
-      }
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+      "script-src": ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+      "style-src": ["'self'", "'unsafe-inline'"],
+      "img-src": ["'self'", "data:"]
     }
-  })
-);
+  }
+}));
 
 app.use(rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -50,9 +49,35 @@ app.set("views", path.join(__dirname, "views"));
 /* ***********************
  * Middleware
  *************************/
+// Session configuration
+app.use(session({
+  store: new (require('connect-pg-simple')(session))({
+    createTableIfMissing: true,
+    pool,
+  }),
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: true,
+  name: 'sessionId',
+  cookie: { 
+    maxAge: 1000 * 60 * 60 * 24 // 1 day
+  }
+}));
+
+// Flash messages
+app.use(flash());
+
+// Body parsing
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(static);
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+// Make flash messages available to all views
+app.use((req, res, next) => {
+  res.locals.messages = req.flash();
+  next();
+});
 
 // Add year to all views
 app.use((req, res, next) => {
@@ -63,19 +88,26 @@ app.use((req, res, next) => {
 /* ***********************
  * Routes
  *************************/
+const static = require("./routes/static");
+const baseController = require("./controllers/baseController");
+const inventoryRoute = require("./routes/inventoryRoute");
+const accountRoute = require("./routes/accountRoute");
+const utilities = require("./utilities/");
+
+app.use(static);
 app.get("/", utilities.handleErrors(baseController.buildHome));
 app.use("/inv", utilities.handleErrors(inventoryRoute));
+app.use("/account", accountRoute);
 
 /* ***********************
- * 404 Route
+ * Error Handlers
  *************************/
+// 404 Handler
 app.use(async (req, res, next) => {
   next({status: 404, message: "Sorry, we appear to have lost that page."});
 });
 
-/* ***********************
- * Express Error Handler
- *************************/
+// Global error handler
 app.use(async (err, req, res, next) => {
   let nav;
   try {
@@ -88,17 +120,12 @@ app.use(async (err, req, res, next) => {
   console.error(`Error ${err.status || 500} at ${req.method} ${req.originalUrl}`);
   console.error('Error details:', err);
   
-  const isDev = process.env.NODE_ENV === 'development';
-  const message = err.status === 404 ? err.message : 
-    isDev ? err.message : "Oh no! There was a crash. Maybe try a different route?";
-
   res.status(err.status || 500).render("errors/error", {
     title: `${err.status || 500} Error`,
-    message,
+    message: err.message,
     nav,
     errors: null,
-    layout: "./layouts/layout",
-    stack: isDev ? err.stack : null
+    layout: "./layouts/layout"
   });
 });
 
