@@ -3,45 +3,69 @@
 <%- include('../partials/head') %>
 <body>
   <div class="container">
-   
-
+    
+    
     <main class="main-content">
       <section class="registration-section">
         <h1>Register</h1>
         
-        <% if (messages && messages.notice) { %>
-          <div class="flash-message notice">
-            <%= messages.notice %>
+        <% if (messages && messages.error) { %>
+          <div class="alert alert-error">
+            <%= messages.error %>
+          </div>
+        <% } %>
+
+        <% if (errors && errors.length > 0) { %>
+          <div class="alert alert-error">
+            <ul>
+              <% errors.forEach(error => { %>
+                <li><%= error.msg %></li>
+              <% }); %>
+            </ul>
           </div>
         <% } %>
 
         <form action="/account/register" method="post" class="registration-form">
           <div class="form-group">
             <label for="account_firstname">First Name</label>
-            <input type="text" id="account_firstname" name="account_firstname" required>
+            <input type="text" id="account_firstname" name="account_firstname" 
+                   value="<%= account_firstname %>"
+                   required
+                   minlength="2"
+                   title="Please enter your first name">
           </div>
           
           <div class="form-group">
             <label for="account_lastname">Last Name</label>
-            <input type="text" id="account_lastname" name="account_lastname" required>
+            <input type="text" id="account_lastname" name="account_lastname" 
+                   value="<%= account_lastname %>"
+                   required
+                   minlength="2"
+                   title="Please enter your last name">
           </div>
           
           <div class="form-group">
             <label for="account_email">Email Address</label>
-            <input type="email" id="account_email" name="account_email" required>
+            <input type="email" id="account_email" name="account_email" 
+                   value="<%= account_email %>"
+                   required
+                   placeholder="example@domain.com"
+                   title="Please enter a valid email address">
           </div>
           
           <div class="form-group password-group">
             <label for="account_password">Password</label>
-            <input type="password" id="account_password" name="account_password" required
-                   pattern="^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{12,}$"
-                   title="Must be at least 12 characters with 1 uppercase, 1 number, and 1 special character">
+            <input type="password" id="account_password" name="account_password" 
+                   required
+                   pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{12,}$"
+                   title="Must contain at least 12 characters, including 1 uppercase, 1 lowercase, 1 number, and 1 special character">
             <button type="button" class="toggle-password" aria-label="Show password">👁️</button>
             <div class="password-requirements">
               <p>Password must:</p>
               <ul>
                 <li>Be at least 12 characters</li>
                 <li>Contain at least 1 uppercase letter</li>
+                <li>Contain at least 1 lowercase letter</li>
                 <li>Contain at least 1 number</li>
                 <li>Contain at least 1 special character</li>
               </ul>
@@ -57,7 +81,7 @@
       </section>
     </main>
 
-   
+    
   </div>
 
   <script>
@@ -67,6 +91,22 @@
       const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
       passwordInput.setAttribute('type', type);
       this.textContent = type === 'password' ? '👁️' : '🔒';
+    });
+
+    // Form validation feedback
+    const form = document.querySelector('.registration-form');
+    const inputs = form.querySelectorAll('input[required]');
+    
+    inputs.forEach(input => {
+      input.addEventListener('invalid', () => {
+        input.classList.add('invalid');
+      });
+      
+      input.addEventListener('input', () => {
+        if (input.validity.valid) {
+          input.classList.remove('invalid');
+        }
+      });
     });
   </script>
 </body>

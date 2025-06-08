@@ -10,6 +10,7 @@ async function buildLogin(req, res, next) {
     title: "Login",
     nav,
     errors: null,
+    account_email: '',
     layout: "./layouts/layout"
   });
 }
@@ -23,6 +24,9 @@ async function buildRegister(req, res, next) {
     title: "Register",
     nav,
     errors: null,
+    account_firstname: '',
+    account_lastname: '',
+    account_email: '',
     layout: "./layouts/layout"
   });
 }

@@ -783,6 +783,76 @@ footer {
   background-color: #d9edf7;
   border-color: #bce8f1;
 }
+
+/* Form Validation Styles */
+input:required:invalid, 
+input:focus:invalid {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+input:required:valid {
+  border-color: #28a745;
+  box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+
+.invalid {
+  border-color: #dc3545 !important;
+}
+
+/* Password Requirements Styling */
+.password-requirements {
+  margin: 1rem 0;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-radius: 0.25rem;
+  border-left: 4px solid #6c757d;
+}
+
+.password-requirements p {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  color: #495057;
+}
+
+.password-requirements ul {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.password-requirements li {
+  margin-bottom: 0.25rem;
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+
+/* Validation Error Styles */
+.alert-error {
+  color: #721c24;
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+  padding: 0.75rem 1.25rem;
+  margin-bottom: 1rem;
+  border: 1px solid transparent;
+  border-radius: 0.25rem;
+}
+
+.alert-error ul {
+  margin: 0;
+  padding-left: 1rem;
+}
+
+.alert-error li {
+  list-style-type: none;
+}
+
+/* Form input error state */
+input.invalid {
+  border-color: #dc3545 !important;
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
 @media (max-width: 768px) {
   .vehicle-detail-container {
     flex-direction: column;
