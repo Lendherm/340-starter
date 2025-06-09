@@ -1,6 +1,8 @@
 const utilities = require("../utilities/");
 const accountModel = require("../models/account-model");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+require("dotenv").config();
 
 /* ****************************************
 *  Deliver login view
@@ -42,7 +44,6 @@ async function registerAccount(req, res, next) {
   // Hash the password before storing
   let hashedPassword;
   try {
-    // regular password and cost (salt is generated automatically)
     hashedPassword = await bcrypt.hashSync(account_password, 10);
   } catch (error) {
     req.flash("notice", 'Sorry, there was an error processing the registration.');
@@ -90,8 +91,9 @@ async function accountLogin(req, res, next) {
   
   try {
     const accountData = await accountModel.getAccountByEmail(account_email);
+    
     if (!accountData) {
-      req.flash("error", "Invalid email or password.");
+      req.flash("notice", "Please check your credentials and try again.");
       return res.status(400).render("account/login", {
         title: "Login",
         nav,
@@ -101,9 +103,14 @@ async function accountLogin(req, res, next) {
       });
     }
 
-    const passwordMatch = await bcrypt.compareSync(account_password, accountData.account_password);
+    // Debug: Verificar contraseñas
+    console.log("Provided password:", account_password);
+    console.log("Stored hash:", accountData.account_password);
+    
+    const passwordMatch = await bcrypt.compare(account_password, accountData.account_password);
+    
     if (!passwordMatch) {
-      req.flash("error", "Invalid email or password.");
+      req.flash("notice", "Please check your credentials and try again.");
       return res.status(400).render("account/login", {
         title: "Login",
         nav,
@@ -113,11 +120,38 @@ async function accountLogin(req, res, next) {
       });
     }
 
-    // If we get here, login was successful
-    req.flash("success", "You are now logged in.");
-    return res.redirect("/account");
+    // Verificar que el secret existe
+    if (!process.env.ACCESS_TOKEN_SECRET) {
+      throw new Error("ACCESS_TOKEN_SECRET is not defined in .env");
+    }
+
+    delete accountData.account_password;
+    const accessToken = jwt.sign(
+      accountData, 
+      process.env.ACCESS_TOKEN_SECRET, 
+      { expiresIn: 3600 * 1000 }
+    );
+    
+    // Configuración de cookies seguras
+    const cookieOptions = {
+      httpOnly: true,
+      maxAge: 3600 * 1000, // 1 hora
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict'
+    };
+    
+    res.cookie("jwt", accessToken, cookieOptions);
+    return res.redirect("/account/");
+    
   } catch (error) {
-    req.flash("error", "Login error: " + error.message);
+    console.error("Login error details:", {
+      message: error.message,
+      stack: error.stack,
+      env: process.env.NODE_ENV,
+      secretSet: !!process.env.ACCESS_TOKEN_SECRET
+    });
+    
+    req.flash("error", "An error occurred during login. Please try again.");
     return res.status(500).render("account/login", {
       title: "Login",
       nav,
@@ -128,4 +162,23 @@ async function accountLogin(req, res, next) {
   }
 }
 
-module.exports = { buildLogin, buildRegister, registerAccount, accountLogin };
+/* ****************************************
+*  Deliver Account Management view
+* *************************************** */
+async function accountManagement(req, res, next) {
+  let nav = await utilities.getNav();
+  res.render("account/management", {
+    title: "Account Management",
+    nav,
+    errors: null,
+    layout: "./layouts/layout"
+  });
+}
+
+module.exports = { 
+  buildLogin, 
+  buildRegister, 
+  registerAccount, 
+  accountLogin,
+  accountManagement
+};

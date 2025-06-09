@@ -26,4 +26,14 @@ router.post(
   utilities.handleErrors(accountController.accountLogin)
 );
 
+// GET route for account management
+router.get("/", utilities.handleErrors(accountController.accountManagement));
+
+// GET route for logout
+router.get("/logout", (req, res) => {
+  res.clearCookie("jwt");
+  req.flash("notice", "You have been logged out.");
+  res.redirect("/account/login");
+});
+
 module.exports = router;

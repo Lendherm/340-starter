@@ -1,0 +1,11 @@
+<nav class="nav-menu">
+  <ul class="nav-list">
+    <li><a href="/">Home</a></li>
+    <% if (loggedin) { %>
+      <li><a href="/account">My Account</a></li>
+      <li><a href="/account/logout">Logout</a></li>
+    <% } else { %>
+      <li><a href="/account/login">Login</a></li>
+    <% } %>
+  </ul>
+</nav>

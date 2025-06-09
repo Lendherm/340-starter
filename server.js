@@ -16,6 +16,7 @@ const pool = require('./database/');
 const path = require("path");
 const bodyParser = require("body-parser");
 const flash = require("connect-flash");
+const cookieParser = require("cookie-parser");
 
 const app = express();
 
@@ -73,6 +74,13 @@ app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// Cookie parser
+app.use(cookieParser());
+
+// JWT token check
+const utilities = require("./utilities/");
+app.use(utilities.checkJWTToken);
+
 // Make flash messages available to all views
 app.use((req, res, next) => {
   res.locals.messages = req.flash();
@@ -92,7 +100,6 @@ const static = require("./routes/static");
 const baseController = require("./controllers/baseController");
 const inventoryRoute = require("./routes/inventoryRoute");
 const accountRoute = require("./routes/accountRoute");
-const utilities = require("./utilities/");
 
 app.use(static);
 app.get("/", utilities.handleErrors(baseController.buildHome));

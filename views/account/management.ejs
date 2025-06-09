@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('../partials/head') %>
+<body>
+  <div class="container">
+    
+    
+    <main class="main-content">
+      <h1>Account Management</h1>
+      
+      <% if (messages && messages.notice) { %>
+        <div class="alert alert-notice">
+          <%= messages.notice %>
+        </div>
+      <% } %>
+      
+      <% if (messages && messages.success) { %>
+        <div class="alert alert-success">
+          <%= messages.success %>
+        </div>
+      <% } %>
+      
+      <div class="account-info">
+        <% if (accountData) { %>
+          <h2>Welcome, <%= accountData.account_firstname %> <%= accountData.account_lastname %></h2>
+          <p>Email: <%= accountData.account_email %></p>
+          <p>Account Type: <%= accountData.account_type %></p>
+        <% } %>
+      </div>
+      
+      <div class="account-actions">
+        <a href="/account/logout" class="btn-primary">Logout</a>
+      </div>
+    </main>
+
+    
+  </div>
+</body>
+</html>
