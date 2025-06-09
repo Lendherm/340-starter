@@ -1,4 +1,3 @@
-
 console.log("Iniciando conexión a la base de datos...");
 console.log("NODE_ENV:", process.env.NODE_ENV);
 console.log("DATABASE_URL:", process.env.DATABASE_URL ? "Presente" : "Falta");

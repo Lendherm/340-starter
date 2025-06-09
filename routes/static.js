@@ -10,3 +10,5 @@ router.use("/js", express.static(path.join(publicPath, 'js')));
 router.use("/images", express.static(path.join(publicPath, 'images')));
 
 module.exports = router;
+
+

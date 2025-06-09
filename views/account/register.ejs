@@ -3,7 +3,7 @@
 <%- include('../partials/head') %>
 <body>
   <div class="container">
-    
+   
     
     <main class="main-content">
       <section class="registration-section">
@@ -29,7 +29,7 @@
           <div class="form-group">
             <label for="account_firstname">First Name</label>
             <input type="text" id="account_firstname" name="account_firstname" 
-                   value="<%= account_firstname %>"
+                   value="<%= locals.account_firstname %>"
                    required
                    minlength="2"
                    title="Please enter your first name">
@@ -38,7 +38,7 @@
           <div class="form-group">
             <label for="account_lastname">Last Name</label>
             <input type="text" id="account_lastname" name="account_lastname" 
-                   value="<%= account_lastname %>"
+                   value="<%= locals.account_lastname %>"
                    required
                    minlength="2"
                    title="Please enter your last name">
@@ -47,7 +47,7 @@
           <div class="form-group">
             <label for="account_email">Email Address</label>
             <input type="email" id="account_email" name="account_email" 
-                   value="<%= account_email %>"
+                   value="<%= locals.account_email %>"
                    required
                    placeholder="example@domain.com"
                    title="Please enter a valid email address">
@@ -81,7 +81,7 @@
       </section>
     </main>
 
-    
+   
   </div>
 
   <script>

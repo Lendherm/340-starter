@@ -4,14 +4,30 @@
 <body>
   <div class="container">
     
-
+    
     <main class="main-content">
       <section class="login-section">
         <h1>Login</h1>
         
+        <% if (messages && messages.success) { %>
+          <div class="alert alert-success">
+            <%= messages.success %>
+          </div>
+        <% } %>
+
         <% if (messages && messages.error) { %>
           <div class="alert alert-error">
             <%= messages.error %>
+          </div>
+        <% } %>
+
+        <% if (errors && errors.length > 0) { %>
+          <div class="alert alert-error">
+            <ul>
+              <% errors.forEach(error => { %>
+                <li><%= error.msg %></li>
+              <% }); %>
+            </ul>
           </div>
         <% } %>
 
@@ -19,6 +35,7 @@
           <div class="form-group">
             <label for="account_email">Email Address</label>
             <input type="email" id="account_email" name="account_email" 
+                   value="<%= locals.account_email || '' %>"
                    required
                    placeholder="example@domain.com"
                    title="Please enter your email address">
@@ -28,20 +45,8 @@
             <label for="account_password">Password</label>
             <input type="password" id="account_password" name="account_password" 
                    required
-                   pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{12,}$"
-                   title="Must contain at least 12 characters, including 1 uppercase, 1 lowercase, 1 number, and 1 special character">
+                   title="Please enter your password">
             <button type="button" class="toggle-password" aria-label="Show password">👁️</button>
-          </div>
-          
-          <div class="password-requirements">
-            <p>Password requirements:</p>
-            <ul>
-              <li>At least 12 characters</li>
-              <li>1 uppercase letter</li>
-              <li>1 lowercase letter</li>
-              <li>1 number</li>
-              <li>1 special character</li>
-            </ul>
           </div>
           
           <button type="submit" class="btn-primary">Login</button>
@@ -53,12 +58,12 @@
       </section>
     </main>
 
-   
+    
   </div>
 
   <script>
     // Password toggle functionality
-    document.querySelector('.toggle-password').addEventListener('click', function() {
+    document.querySelector('.toggle-password')?.addEventListener('click', function() {
       const passwordInput = document.getElementById('account_password');
       const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
       passwordInput.setAttribute('type', type);
