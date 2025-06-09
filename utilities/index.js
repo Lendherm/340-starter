@@ -97,7 +97,6 @@ Util.buildInventoryItemDetail = async function(vehicle) {
               <span class="spec-label">Color:</span>
               <span class="spec-value">${vehicle.inv_color}</span>
             </div>
-            <!-- Add more specs as needed -->
           </div>
           
           <div class="vehicle-description">
@@ -115,6 +114,28 @@ Util.buildInventoryItemDetail = async function(vehicle) {
   } catch (error) {
     console.error("Error building inventory detail:", error);
     return '<div class="error-message"><p>Error loading vehicle details</p></div>';
+  }
+};
+
+Util.buildClassificationList = async function (classification_id = null) {
+  try {
+    const data = await invModel.getClassifications();
+    let classificationList = '<select name="classification_id" id="classificationList" required>';
+    classificationList += '<option value="">Choose a Classification</option>';
+    
+    data.rows.forEach((row) => {
+      classificationList += `<option value="${row.classification_id}"`;
+      if (classification_id != null && row.classification_id == classification_id) {
+        classificationList += " selected";
+      }
+      classificationList += `>${row.classification_name}</option>`;
+    });
+    
+    classificationList += "</select>";
+    return classificationList;
+  } catch (error) {
+    console.error("buildClassificationList error:", error);
+    return '<select name="classification_id" id="classificationList" required><option value="">Error loading classifications</option></select>';
   }
 };
 
