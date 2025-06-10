@@ -114,7 +114,7 @@ async function updateInventoryItem(inventoryData) {
       inventoryData.inv_id
     ];
 
-    console.log('Update params:', params); // Debug logging
+    console.log('Update params:', params);
     return await pool.query(sql, params);
   } catch (error) {
     console.error("updateInventoryItem error:", error);
@@ -133,6 +133,22 @@ async function deleteInventoryItem(inv_id) {
   }
 }
 
+async function deleteClassification(classification_id) {
+  try {
+    // Primero elimina todos los vehículos en esta clasificación
+    await pool.query('DELETE FROM inventory WHERE classification_id = $1', [classification_id]);
+    
+    // Luego elimina la clasificación
+    const result = await pool.query(
+      'DELETE FROM classification WHERE classification_id = $1 RETURNING *',
+      [classification_id]
+    );
+    return result;
+  } catch (error) {
+    console.error("deleteClassification error:", error);
+    throw error;
+  }
+}
 
 module.exports = {
   getClassifications,
@@ -141,5 +157,6 @@ module.exports = {
   addClassification,
   addInventoryItem,
   updateInventoryItem,
-  deleteInventoryItem
+  deleteInventoryItem,
+  deleteClassification
 };

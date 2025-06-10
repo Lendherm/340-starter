@@ -22,33 +22,30 @@
                 <div class="management-links">
                   <a href="/inv/add-classification" class="btn-primary">Add New Classification</a>
                   <a href="/inv/add-inventory" class="btn-primary">Add New Inventory</a>
-                  <a href="/inv/delete/${vehicle.inv_id}" class="action-link delete" title="Click to delete">
-                    Delete
-                  </a>
                 </div>
 
-                <h2>Manage Inventory</h2>
-                <p>Select a classification from the list to see the items belonging to that classification.</p>
+                <div class="classification-controls">
+                  <%- classificationSelect %>
+                    <button id="deleteClassificationBtn" class="btn-danger" disabled>Delete Classification</button>
+                </div>
 
-                <%- classificationSelect %>
-
-                  <table id="inventoryDisplay" class="inventory-table">
-                    <thead>
-                      <tr>
-                        <th>Vehicle Name</th>
-                        <th>Action</th>
-                        <th>Action</th>
-                      </tr>
-                    </thead>
-                    <tbody id="inventoryTableBody">
-                      <!-- Inventory items will be inserted here by JavaScript -->
-                    </tbody>
-                  </table>
-                  <noscript>
-                    <div class="alert alert-error">
-                      JavaScript must be enabled to use this page.
-                    </div>
-                  </noscript>
+                <table id="inventoryDisplay" class="inventory-table">
+                  <thead>
+                    <tr>
+                      <th>Vehicle Name</th>
+                      <th>Action</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="inventoryTableBody">
+                    <!-- Inventory items will be inserted here by JavaScript -->
+                  </tbody>
+                </table>
+                <noscript>
+                  <div class="alert alert-error">
+                    JavaScript must be enabled to use this page.
+                  </div>
+                </noscript>
       </main>
 
 

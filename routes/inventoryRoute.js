@@ -79,4 +79,17 @@ router.post(
   utilities.handleErrors(invController.deleteInventoryItem)
 );
 
+router.get(
+  "/delete-classification/:classification_id",
+  utilities.checkLogin,
+  utilities.checkAccountType(['Admin']),
+  utilities.handleErrors(invController.buildDeleteClassificationView)
+);
+
+router.post(
+  "/delete-classification",
+  utilities.checkLogin,
+  utilities.checkAccountType(['Admin']),
+  utilities.handleErrors(invController.deleteClassification)
+);
 module.exports = router;

@@ -1,0 +1,41 @@
+<%- include('../partials/head') %>
+<body>
+  <div class="container">
+    
+    
+    <main class="main-content">
+      <h1>Delete Classification</h1>
+      
+      <% if (messages && messages.error) { %>
+        <div class="alert alert-error">
+          <%= messages.error %>
+        </div>
+      <% } %>
+      
+      <div class="confirmation-warning">
+        <p><strong>Warning:</strong> This action cannot be undone!</p>
+        <p>You are about to delete the "<%= classification_name %>" classification.</p>
+        <% if (inventory_count > 0) { %>
+          <p>This will also permanently delete <%= inventory_count %> vehicle(s) associated with this classification.</p>
+        <% } %>
+      </div>
+      
+      <form action="/inv/delete-classification" method="post" class="management-form">
+        <input type="hidden" name="classification_id" value="<%= classification_id %>">
+        
+        <div class="form-group">
+          <label>Classification Name</label>
+          <input type="text" value="<%= classification_name %>" readonly>
+        </div>
+        
+        <div class="form-actions">
+          <button type="submit" class="btn-primary delete-btn">Confirm Deletion</button>
+          <a href="/inv/" class="btn-secondary">Cancel</a>
+        </div>
+      </form>
+    </main>
+    
+    
+  </div>
+</body>
+</html>

@@ -2,11 +2,15 @@
 
 document.addEventListener('DOMContentLoaded', function() {
   const classificationList = document.querySelector("#classificationList");
+  const deleteClassificationBtn = document.querySelector("#deleteClassificationBtn");
   
-  if (classificationList) {
+  if (classificationList && deleteClassificationBtn) {
     classificationList.addEventListener("change", function() {
       const classification_id = classificationList.value;
       console.log(`Selected classification_id: ${classification_id}`);
+      
+      // Enable/disable delete button based on selection
+      deleteClassificationBtn.disabled = !classification_id;
       
       if (!classification_id) {
         document.getElementById("inventoryTableBody").innerHTML = "";
@@ -31,6 +35,13 @@ document.addEventListener('DOMContentLoaded', function() {
           document.getElementById("inventoryTableBody").innerHTML = 
             `<tr><td colspan="3">Error loading inventory: ${error.message}</td></tr>`;
         });
+    });
+    
+    deleteClassificationBtn.addEventListener('click', function() {
+      const classificationId = classificationList.value;
+      if (classificationId) {
+        window.location.href = `/inv/delete-classification/${classificationId}`;
+      }
     });
   }
 

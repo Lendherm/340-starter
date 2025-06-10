@@ -1,5 +1,6 @@
 const invModel = require("../models/inventory-model");
 const utilities = require("../utilities/");
+const pool = require('../database/');
 
 const invCont = {};
 
@@ -342,6 +343,68 @@ invCont.deleteInventoryItem = async function (req, res, next) {
   } catch (error) {
     req.flash("error", "Error deleting vehicle: " + error.message);
     res.redirect(`/inv/delete/${req.body.inv_id}`);
+  }
+};
+
+/* [Mantén todos los métodos existentes...] */
+
+/* ***************************
+ *  Build delete classification confirmation view
+ * ************************** */
+invCont.buildDeleteClassificationView = async function (req, res, next) {
+  try {
+    const classification_id = parseInt(req.params.classification_id);
+    let nav = await utilities.getNav();
+    const classificationData = await invModel.getClassifications(); // Cambia esto
+    
+    // Encuentra la clasificación específica
+    const classification = classificationData.rows.find(
+      c => c.classification_id == classification_id
+    );
+    
+    if (!classification) {
+      req.flash("error", "Classification not found.");
+      return res.redirect("/inv/");
+    }
+    
+    // Count inventory items in this classification
+    const inventoryCount = await pool.query(
+      'SELECT COUNT(*) FROM inventory WHERE classification_id = $1',
+      [classification_id]
+    );
+    
+    res.render("./inventory/delete-classification-confirm", {
+      title: "Delete Classification",
+      nav,
+      errors: null,
+      classification_id,
+      classification_name: classification.classification_name,
+      inventory_count: inventoryCount.rows[0].count,
+      layout: "./layouts/layout"
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/* ***************************
+ *  Delete classification and its inventory
+ * ************************** */
+invCont.deleteClassification = async function (req, res, next) {
+  try {
+    const classification_id = parseInt(req.body.classification_id);
+    const result = await invModel.deleteClassification(classification_id);
+    
+    if (result.rowCount > 0) {
+      req.flash("success", "Classification and all associated vehicles were successfully deleted.");
+      res.redirect("/inv/");
+    } else {
+      req.flash("error", "Sorry, the deletion failed.");
+      res.redirect(`/inv/delete-classification/${classification_id}`);
+    }
+  } catch (error) {
+    req.flash("error", "Error deleting classification: " + error.message);
+    res.redirect(`/inv/delete-classification/${req.body.classification_id}`);
   }
 };
 
