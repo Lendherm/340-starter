@@ -1,7 +1,8 @@
 const invModel = require("../models/inventory-model");
-const Util = {};
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
+
+const Util = {};
 
 Util.getNav = async function () {
   try {
@@ -146,26 +147,57 @@ Util.handleErrors = fn => (req, res, next) => {
 };
 
 /* ****************************************
-* Middleware to check token validity
-**************************************** */
+ * Middleware to check token validity
+ **************************************** */
 Util.checkJWTToken = (req, res, next) => {
-  if (req.cookies.jwt) {
-    jwt.verify(
-      req.cookies.jwt,
-      process.env.ACCESS_TOKEN_SECRET,
-      function (err, accountData) {
-        if (err) {
-          req.flash("notice", "Please log in");
-          res.clearCookie("jwt");
-          return res.redirect("/account/login");
-        }
-        res.locals.accountData = accountData;
-        res.locals.loggedin = 1;
-        next();
-      })
-  } else {
-    next();
+  const token = req.cookies.jwt;
+  
+  if (!token) {
+    return next();
   }
+
+  jwt.verify(
+    token,
+    process.env.ACCESS_TOKEN_SECRET,
+    (err, decoded) => {
+      if (err) {
+        res.clearCookie("jwt");
+        req.flash("notice", "Session expired. Please log in again.");
+        return res.redirect("/account/login");
+      }
+      
+      res.locals.accountData = decoded;
+      res.locals.loggedin = 1;
+      next();
+    }
+  );
+};
+
+/* ****************************************
+ *  Check Login Middleware
+ * ************************************ */
+Util.checkLogin = (req, res, next) => {
+  if (res.locals.loggedin) {
+    next();
+  } else {
+    req.flash("notice", "Please log in.");
+    return res.redirect("/account/login");
+  }
+};
+
+/* ****************************************
+ *  Check Account Type Middleware
+ * ************************************ */
+Util.checkAccountType = (requiredType) => {
+  return (req, res, next) => {
+    if (res.locals.accountData && 
+        res.locals.accountData.account_type === requiredType) {
+      next();
+    } else {
+      req.flash("notice", "You don't have permission to access this page.");
+      return res.redirect("/account/");
+    }
+  };
 };
 
 module.exports = Util;

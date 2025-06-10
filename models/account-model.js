@@ -44,7 +44,7 @@ async function getAccountByEmail(account_email) {
     return result.rows[0];
   } catch (error) {
     console.error("getAccountByEmail error:", error);
-    throw error;
+    return null;
   }
 }
 

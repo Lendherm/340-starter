@@ -41,24 +41,17 @@ async function registerAccount(req, res, next) {
   let nav = await utilities.getNav();
   const { account_firstname, account_lastname, account_email, account_password } = req.body;
 
-  // Hash the password before storing
-  let hashedPassword;
   try {
-    hashedPassword = await bcrypt.hashSync(account_password, 10);
-  } catch (error) {
-    req.flash("notice", 'Sorry, there was an error processing the registration.');
-    return res.status(500).render("account/register", {
-      title: "Registration",
-      nav,
-      errors: null,
-      account_firstname,
-      account_lastname,
-      account_email,
-      layout: "./layouts/layout"
-    });
-  }
+    // Validar si el email ya existe
+    const existingAccount = await accountModel.getAccountByEmail(account_email);
+    if (existingAccount) {
+      req.flash("error", "This email is already registered. Please log in.");
+      return res.redirect("/account/login");
+    }
 
-  try {
+    // Hash the password before storing
+    const hashedPassword = bcrypt.hashSync(account_password, 10);
+    
     const regResult = await accountModel.registerAccount(
       account_firstname,
       account_lastname,
@@ -67,16 +60,14 @@ async function registerAccount(req, res, next) {
     );
 
     if (regResult.rowCount > 0) {
-      req.flash(
-        "success",
-        `Congratulations, you're registered ${account_firstname}. Please log in.`
-      );
+      req.flash("success", `Congratulations, you're registered ${account_firstname}. Please log in.`);
       return res.redirect("/account/login");
     } else {
       req.flash("error", "Sorry, the registration failed.");
       return res.redirect("/account/register");
     }
   } catch (error) {
+    console.error("Registration error:", error);
     req.flash("error", "Registration error: " + error.message);
     return res.redirect("/account/register");
   }
@@ -103,10 +94,6 @@ async function accountLogin(req, res, next) {
       });
     }
 
-    // Debug: Verificar contraseñas
-    console.log("Provided password:", account_password);
-    console.log("Stored hash:", accountData.account_password);
-    
     const passwordMatch = await bcrypt.compare(account_password, accountData.account_password);
     
     if (!passwordMatch) {
@@ -120,7 +107,6 @@ async function accountLogin(req, res, next) {
       });
     }
 
-    // Verificar que el secret existe
     if (!process.env.ACCESS_TOKEN_SECRET) {
       throw new Error("ACCESS_TOKEN_SECRET is not defined in .env");
     }
@@ -129,10 +115,9 @@ async function accountLogin(req, res, next) {
     const accessToken = jwt.sign(
       accountData, 
       process.env.ACCESS_TOKEN_SECRET, 
-      { expiresIn: 3600 * 1000 }
+      { expiresIn: '1h' } // Corregido a 1 hora
     );
     
-    // Configuración de cookies seguras
     const cookieOptions = {
       httpOnly: true,
       maxAge: 3600 * 1000, // 1 hora
@@ -171,6 +156,7 @@ async function accountManagement(req, res, next) {
     title: "Account Management",
     nav,
     errors: null,
+    accountData: res.locals.accountData,
     layout: "./layouts/layout"
   });
 }

@@ -25,6 +25,13 @@
           <h2>Welcome, <%= accountData.account_firstname %> <%= accountData.account_lastname %></h2>
           <p>Email: <%= accountData.account_email %></p>
           <p>Account Type: <%= accountData.account_type %></p>
+          
+          <% if (accountData.account_type === 'Admin') { %>
+            <div class="admin-features">
+              <h3>Admin Features</h3>
+              <a href="/inv" class="btn-primary">Inventory Management</a>
+            </div>
+          <% } %>
         <% } %>
       </div>
       
