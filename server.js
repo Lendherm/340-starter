@@ -50,6 +50,13 @@ app.set("views", path.join(__dirname, "views"));
 /* ***********************
  * Middleware
  *************************/
+// Initialize res.locals
+app.use((req, res, next) => {
+  res.locals.loggedin = false;
+  res.locals.accountData = null;
+  next();
+});
+
 // Session configuration
 app.use(session({
   store: new (require('connect-pg-simple')(session))({
@@ -61,7 +68,10 @@ app.use(session({
   saveUninitialized: true,
   name: 'sessionId',
   cookie: { 
-    maxAge: 1000 * 60 * 60 * 24 // 1 day
+    maxAge: 1000 * 60 * 60 * 24, // 1 day
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: true,
+    sameSite: 'strict'
   }
 }));
 
@@ -77,7 +87,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Cookie parser
 app.use(cookieParser());
 
-// JWT token check - Make sure utilities is properly required
+// JWT token check
 const utilities = require("./utilities/");
 app.use(utilities.checkJWTToken);
 

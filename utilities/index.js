@@ -169,7 +169,7 @@ Util.checkJWTToken = (req, res, next) => {
       }
       
       res.locals.accountData = decoded;
-      res.locals.loggedin = true;  // Explicitly set loggedin to true
+      res.locals.loggedin = true;
       next();
     }
   );
@@ -190,10 +190,10 @@ Util.checkLogin = (req, res, next) => {
 /* ****************************************
  *  Check Account Type Middleware
  * ************************************ */
-Util.checkAccountType = (requiredType) => {
+Util.checkAccountType = (requiredTypes) => {
   return (req, res, next) => {
     if (res.locals.accountData && 
-        res.locals.accountData.account_type === requiredType) {
+        requiredTypes.includes(res.locals.accountData.account_type)) {
       next();
     } else {
       req.flash("notice", "You don't have permission to access this page.");
