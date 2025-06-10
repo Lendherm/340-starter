@@ -153,6 +153,7 @@ Util.checkJWTToken = (req, res, next) => {
   const token = req.cookies.jwt;
   
   if (!token) {
+    res.locals.loggedin = false;
     return next();
   }
 
@@ -162,12 +163,13 @@ Util.checkJWTToken = (req, res, next) => {
     (err, decoded) => {
       if (err) {
         res.clearCookie("jwt");
+        res.locals.loggedin = false;
         req.flash("notice", "Session expired. Please log in again.");
         return res.redirect("/account/login");
       }
       
       res.locals.accountData = decoded;
-      res.locals.loggedin = 1;
+      res.locals.loggedin = true;  // Explicitly set loggedin to true
       next();
     }
   );

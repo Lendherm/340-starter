@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('../partials/head') %>
+<body>
+  <div class="container">
+    
+    
+    <main class="main-content">
+      <h1><%= title %></h1>
+      
+      <% if (messages && messages.error) { %>
+        <div class="alert alert-error">
+          <%= messages.error %>
+        </div>
+      <% } %>
+      
+      <% if (errors && errors.length > 0) { %>
+        <div class="alert alert-error">
+          <ul>
+            <% errors.forEach(error => { %>
+              <li><%= error.msg %></li>
+            <% }); %>
+          </ul>
+        </div>
+      <% } %>
+
+      <section class="account-update-section">
+        <form action="/account/update" method="post" class="account-form">
+          <input type="hidden" name="account_id" value="<%= accountData.account_id %>">
+          
+          <div class="form-group">
+            <label for="account_firstname">First Name</label>
+            <input type="text" id="account_firstname" name="account_firstname" 
+                   value="<%= accountData.account_firstname %>"
+                   required>
+          </div>
+          
+          <div class="form-group">
+            <label for="account_lastname">Last Name</label>
+            <input type="text" id="account_lastname" name="account_lastname" 
+                   value="<%= accountData.account_lastname %>"
+                   required>
+          </div>
+          
+          <div class="form-group">
+            <label for="account_email">Email Address</label>
+            <input type="email" id="account_email" name="account_email" 
+                   value="<%= accountData.account_email %>"
+                   required>
+          </div>
+          
+          <button type="submit" class="btn-primary">Update Account</button>
+        </form>
+        
+        <form action="/account/update-password" method="post" class="password-form">
+          <input type="hidden" name="account_id" value="<%= accountData.account_id %>">
+          
+          <div class="form-group">
+            <label for="account_password">New Password</label>
+            <input type="password" id="account_password" name="account_password" 
+                   pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{12,}$"
+                   title="Must contain at least 12 characters, including 1 uppercase, 1 lowercase, 1 number, and 1 special character"
+                   required>
+            <div class="password-requirements">
+              <p>Password must:</p>
+              <ul>
+                <li>Be at least 12 characters</li>
+                <li>Contain at least 1 uppercase letter</li>
+                <li>Contain at least 1 lowercase letter</li>
+                <li>Contain at least 1 number</li>
+                <li>Contain at least 1 special character</li>
+              </ul>
+            </div>
+          </div>
+          
+          <button type="submit" class="btn-primary">Change Password</button>
+        </form>
+      </section>
+    </main>
+
+    
+  </div>
+</body>
+</html>

@@ -120,4 +120,89 @@ validate.checkLoginData = async (req, res, next) => {
   next();
 };
 
+/* **********************************
+ *  Update Data Validation Rules
+ * ********************************* */
+validate.updateRules = () => {
+  return [
+    body("account_firstname")
+      .trim()
+      .notEmpty()
+      .withMessage("First name is required."),
+      
+    body("account_lastname")
+      .trim()
+      .notEmpty()
+      .withMessage("Last name is required."),
+      
+    body("account_email")
+      .trim()
+      .isEmail()
+      .withMessage("Valid email is required.")
+      .custom(async (account_email, { req }) => {
+        const account = await accountModel.getAccountByEmail(account_email);
+        if (account && account.account_id != req.body.account_id) {
+          throw new Error("Email already in use by another account.");
+        }
+      })
+  ];
+};
+
+/* **********************************
+ *  Password Validation Rules
+ * ********************************* */
+validate.passwordRules = () => {
+  return [
+    body("account_password")
+      .trim()
+      .isStrongPassword({
+        minLength: 12,
+        minLowercase: 1,
+        minUppercase: 1,
+        minNumbers: 1,
+        minSymbols: 1,
+      })
+      .withMessage("Password does not meet requirements.")
+  ];
+};
+
+/* **********************************
+ *  Check Update Data
+ * ********************************* */
+validate.checkUpdateData = async (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    let nav = await utilities.getNav();
+    const accountData = await accountModel.getAccountById(req.body.account_id);
+    return res.render("account/update", {
+      title: "Update Account",
+      nav,
+      errors: errors.array(),
+      accountData,
+      layout: "./layouts/layout"
+    });
+  }
+  next();
+};
+
+/* **********************************
+ *  Check Password Data
+ * ********************************* */
+validate.checkPasswordData = async (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    let nav = await utilities.getNav();
+    const accountData = await accountModel.getAccountById(req.body.account_id);
+    return res.render("account/update", {
+      title: "Update Account",
+      nav,
+      errors: errors.array(),
+      accountData,
+      layout: "./layouts/layout"
+    });
+  }
+  next();
+};
+
+
 module.exports = validate;

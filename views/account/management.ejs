@@ -3,16 +3,10 @@
 <%- include('../partials/head') %>
 <body>
   <div class="container">
-    
+   
     
     <main class="main-content">
       <h1>Account Management</h1>
-      
-      <% if (messages && messages.notice) { %>
-        <div class="alert alert-notice">
-          <%= messages.notice %>
-        </div>
-      <% } %>
       
       <% if (messages && messages.success) { %>
         <div class="alert alert-success">
@@ -20,27 +14,29 @@
         </div>
       <% } %>
       
+      <% if (messages && messages.error) { %>
+        <div class="alert alert-error">
+          <%= messages.error %>
+        </div>
+      <% } %>
+
       <div class="account-info">
-        <% if (accountData) { %>
-          <h2>Welcome, <%= accountData.account_firstname %> <%= accountData.account_lastname %></h2>
-          <p>Email: <%= accountData.account_email %></p>
-          <p>Account Type: <%= accountData.account_type %></p>
-          
-          <% if (accountData.account_type === 'Admin') { %>
-            <div class="admin-features">
-              <h3>Admin Features</h3>
-              <a href="/inv" class="btn-primary">Inventory Management</a>
-            </div>
-          <% } %>
+        <h2>Welcome <%= accountData.account_firstname %></h2>
+        
+        <p>Name: <%= accountData.account_firstname %> <%= accountData.account_lastname %></p>
+        <p>Email: <%= accountData.account_email %></p>
+        <p>Account Type: <%= accountData.account_type %></p>
+        
+        <a href="/account/update/<%= accountData.account_id %>" class="btn-primary">Update Account Information</a>
+        
+        <% if (accountData.account_type === 'Employee' || accountData.account_type === 'Admin') { %>
+          <h3>Inventory Management</h3>
+          <p><a href="/inv" class="btn-secondary">Manage Inventory</a></p>
         <% } %>
-      </div>
-      
-      <div class="account-actions">
-        <a href="/account/logout" class="btn-primary">Logout</a>
       </div>
     </main>
 
-    
+   
   </div>
 </body>
 </html>

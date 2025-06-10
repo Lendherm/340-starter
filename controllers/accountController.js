@@ -161,10 +161,102 @@ async function accountManagement(req, res, next) {
   });
 }
 
+
+/* ****************************************
+*  Deliver Update Account view
+* *************************************** */
+async function buildUpdateView(req, res, next) {
+  try {
+    const account_id = parseInt(req.params.account_id);
+    const accountData = await accountModel.getAccountById(account_id);
+    
+    if (!accountData) {
+      req.flash("error", "Account not found.");
+      return res.redirect("/account/");
+    }
+    
+    let nav = await utilities.getNav();
+    res.render("account/update", {
+      title: "Update Account",
+      nav,
+      errors: null,
+      accountData,
+      layout: "./layouts/layout"
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+/* ****************************************
+*  Process Account Update
+* *************************************** */
+async function updateAccount(req, res, next) {
+  try {
+    const { account_id, account_firstname, account_lastname, account_email } = req.body;
+    
+    const updatedAccount = await accountModel.updateAccount(
+      account_id,
+      account_firstname,
+      account_lastname,
+      account_email
+    );
+    
+    if (updatedAccount) {
+      // Update the JWT token with new account data
+      const accessToken = jwt.sign(
+        updatedAccount, 
+        process.env.ACCESS_TOKEN_SECRET, 
+        { expiresIn: '1h' }
+      );
+      
+      res.cookie("jwt", accessToken, {
+        httpOnly: true,
+        maxAge: 3600 * 1000,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict'
+      });
+      
+      req.flash("success", "Account updated successfully.");
+      return res.redirect("/account/");
+    } else {
+      req.flash("error", "Failed to update account.");
+      return res.redirect(`/account/update/${account_id}`);
+    }
+  } catch (error) {
+    next(error);
+  }
+}
+
+/* ****************************************
+*  Process Password Update
+* *************************************** */
+async function updatePassword(req, res, next) {
+  try {
+    const { account_id, account_password } = req.body;
+    const hashedPassword = bcrypt.hashSync(account_password, 10);
+    
+    const result = await accountModel.updatePassword(account_id, hashedPassword);
+    
+    if (result) {
+      req.flash("success", "Password updated successfully.");
+      return res.redirect("/account/");
+    } else {
+      req.flash("error", "Failed to update password.");
+      return res.redirect(`/account/update/${account_id}`);
+    }
+  } catch (error) {
+    next(error);
+  }
+}
+
 module.exports = { 
   buildLogin, 
   buildRegister, 
   registerAccount, 
   accountLogin,
-  accountManagement
+  accountManagement,
+  buildUpdateView,
+  updateAccount,
+  updatePassword
 };

@@ -77,7 +77,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Cookie parser
 app.use(cookieParser());
 
-// JWT token check
+// JWT token check - Make sure utilities is properly required
 const utilities = require("./utilities/");
 app.use(utilities.checkJWTToken);
 
@@ -103,7 +103,7 @@ const accountRoute = require("./routes/accountRoute");
 
 app.use(static);
 app.get("/", utilities.handleErrors(baseController.buildHome));
-app.use("/inv", utilities.handleErrors(inventoryRoute));
+app.use("/inv", inventoryRoute);
 app.use("/account", accountRoute);
 
 /* ***********************

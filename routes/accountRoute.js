@@ -26,18 +26,43 @@ router.post(
   utilities.handleErrors(accountController.accountLogin)
 );
 
-// GET route for account management (protected)
+// GET route for account management
 router.get(
   "/",
   utilities.checkLogin,
   utilities.handleErrors(accountController.accountManagement)
 );
 
+// GET route for update view
+router.get(
+  "/update/:account_id",
+  utilities.checkLogin,
+  utilities.handleErrors(accountController.buildUpdateView)
+);
+
+// POST route for account update
+router.post(
+  "/update",
+  utilities.checkLogin,
+  regValidate.updateRules(),
+  regValidate.checkUpdateData,
+  utilities.handleErrors(accountController.updateAccount)
+);
+
+// POST route for password update
+router.post(
+  "/update-password",
+  utilities.checkLogin,
+  regValidate.passwordRules(),
+  regValidate.checkPasswordData,
+  utilities.handleErrors(accountController.updatePassword)
+);
+
 // GET route for logout
 router.get("/logout", (req, res) => {
   res.clearCookie("jwt");
-  req.flash("success", "You have been logged out.");
-  res.redirect("/account/login");
+  req.flash("success", "You have been successfully logged out.");
+  res.redirect("/");
 });
 
 module.exports = router;
