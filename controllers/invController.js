@@ -408,4 +408,48 @@ invCont.deleteClassification = async function (req, res, next) {
   }
 };
 
+/* ***************************
+ * Inventory Search Feature
+ * ************************** */
+
+invCont.buildSearchView = async function(req, res, next) {
+  try {
+    let nav = await utilities.getNav();
+    res.render("inventory/search", {
+      title: "Search Inventory",
+      nav,
+      errors: null,
+      results: null,
+      searchTerm: '',
+      layout: "./layouts/layout"
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+invCont.searchInventory = async function(req, res, next) {
+  try {
+    const searchTerm = req.body.searchTerm || req.query.searchTerm;
+    if (!searchTerm) {
+      return res.redirect('/inv/search');
+    }
+    
+    
+    const results = await invModel.searchInventory(searchTerm);
+    let nav = await utilities.getNav();
+    
+    res.render("inventory/search", {
+      title: "Search Results",
+      nav,
+      errors: null,
+      results: results.rows,
+      searchTerm,
+      layout: "./layouts/layout"
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = invCont;

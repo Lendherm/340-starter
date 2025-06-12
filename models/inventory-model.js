@@ -150,6 +150,21 @@ async function deleteClassification(classification_id) {
   }
 }
 
+async function searchInventory(searchTerm) {
+  try {
+    const query = `
+      SELECT i.*, c.classification_name 
+      FROM inventory AS i
+      JOIN classification AS c ON i.classification_id = c.classification_id
+      WHERE i.inv_make ILIKE $1 OR i.inv_model ILIKE $1 OR c.classification_name ILIKE $1
+      ORDER BY i.inv_make, i.inv_model`;
+    return await pool.query(query, [`%${searchTerm}%`]);
+  } catch (error) {
+    console.error("searchInventory error:", error);
+    throw error;
+  }
+}
+
 module.exports = {
   getClassifications,
   getInventoryByClassificationId,
@@ -158,5 +173,6 @@ module.exports = {
   addInventoryItem,
   updateInventoryItem,
   deleteInventoryItem,
-  deleteClassification
+  deleteClassification,
+  searchInventory
 };

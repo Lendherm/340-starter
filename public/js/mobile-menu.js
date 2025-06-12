@@ -1,13 +1,10 @@
-document.addEventListener('DOMContentLoaded', function() {
-  const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
-  const nav = document.querySelector('nav');
-  
-  if (mobileMenuBtn && nav) {
-    mobileMenuBtn.addEventListener('click', function() {
-      nav.classList.toggle('show');
-      console.log('Menú clickeado - Estado:', nav.classList.contains('show'));
-    });
-  } else {
-    console.error('No se encontraron elementos del menú móvil');
-  }
+document.addEventListener("DOMContentLoaded", () => {
+  const toggleBtn = document.querySelector("#menu-toggle");
+  const nav = document.querySelector("#main-nav");
+
+  if (!toggleBtn || !nav) return;
+
+  toggleBtn.addEventListener("click", () => {
+    nav.classList.toggle("show");
+  });
 });

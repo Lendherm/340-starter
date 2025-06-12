@@ -92,4 +92,16 @@ router.post(
   utilities.checkAccountType(['Admin']),
   utilities.handleErrors(invController.deleteClassification)
 );
+
+router.get(
+  "/search",
+  utilities.handleErrors(invController.buildSearchView)
+);
+
+router.post(
+  "/search",
+  utilities.handleErrors(invController.searchInventory)
+);
+
+
 module.exports = router;

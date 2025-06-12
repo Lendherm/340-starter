@@ -10,6 +10,15 @@
         <!-- Welcome Section (solo en página de inicio) -->
         <section class="welcome-section">
           <h1>Welcome to CSE Motors!</h1>
+
+          <!-- Add Search Form Here -->
+          <form action="/inv/search" method="get" class="search-form">
+            <div class="form-group">
+              <input type="text" name="searchTerm" placeholder="Search vehicles by make, model or type">
+              <button type="submit" class="btn-primary">Search</button>
+            </div>
+          </form>
+          
           <% if (messages && messages.success) { %>
   <div class="alert alert-success">
     <%= messages.success %>
@@ -92,18 +101,5 @@
    
   </div>
 
-  <script>
-    // Mobile menu functionality
-    document.addEventListener('DOMContentLoaded', function() {
-      const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
-      const nav = document.querySelector('nav');
-      
-      if (mobileMenuBtn) {
-        mobileMenuBtn.addEventListener('click', function() {
-          nav.classList.toggle('show');
-        });
-      }
-    });
-  </script>
 </body>
 </html>
